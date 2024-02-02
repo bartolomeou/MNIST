@@ -6,11 +6,9 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route('/submit_experiment')
-def submit_experiment():
-    return 'Experiment submitted!'
+@app.route('/add_job', methods=['POST'])
+def add_job():
+    print('New job')
 
-@app.route('/get_experiment_results')
-def get_experiment_results():
-    return 'Experiment results'
-
+    return render_template('index.html')
+    
