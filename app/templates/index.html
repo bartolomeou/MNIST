@@ -1,0 +1,48 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Experiment Management System</title>
+	</head>
+	<body>
+		<h1>Experiment Management System</h1>
+		<main>
+			<div>
+				<form
+					id="'newJob"
+					action="{{url_for('add_job')}}"
+					method="POST"
+				>
+					<label for="batch-size">Batch size</label>
+					<input
+						type="text"
+						id="batch-size"
+						name="batch-size"
+						required
+					/>
+
+					<label for="learning-rate">Learning rate</label>
+					<input
+						type="text"
+						id="learning-rate"
+						name="learning-rate"
+						required
+					/>
+
+					<label for="number-of-epochs">Number of epochs</label>
+					<input
+						type="text"
+						id="number-of-epochs"
+						name="number-of-epochs"
+						required
+					/>
+
+					<input class="button1" value="Add job" type="submit" />
+				</form>
+			</div>
+
+			{% block result %} {% endblock %}
+		</main>
+	</body>
+</html>

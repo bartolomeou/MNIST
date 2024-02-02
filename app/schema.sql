@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS job;
+
+CREATE TABLE job (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    batch_size INTEGER NOT NULL,
+    learning_rate INTEGER NOT NULL,
+    epochs INTEGER NOT NULL,
+    accuracy INTEGER
+);
