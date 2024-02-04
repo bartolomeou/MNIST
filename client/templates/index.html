@@ -4,19 +4,15 @@
 	<head>
 		<meta charset="UTF-8" />
 		<title>Experiment Management System</title>
-
-		<!-- include jQuery -->
 		<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-		<!-- include JavaScript file -->
-		<script src="{{ url_for('static', filename='check_progress') }}"></script>
+		<script src="{{ url_for('static', filename='scripts/check_progress.js') }}"></script>
 	</head>
 	<body>
 		<h1>Experiment Management System</h1>
 		<main>
 			<div>
 				<form
-					id="'newJob"
+					id="newJob"
 					action="{{url_for('experiment.add_job')}}"
 					method="POST"
 				>
@@ -44,13 +40,17 @@
 						required
 					/>
 
-					<input class="button1" value="Add job" type="submit" />
+					<input class="button" value="Add job" type="submit" />
 				</form>
 			</div>
 
 			<!-- <script>
 				check_progress(job_id, progress_bar);
 			</script> -->
+			<div id="progress_container">
+				<div id="progress_bar"></div>
+			</div>
+
 			<div class="container">{% block result %} {% endblock %}</div>
 		</main>
 	</body>

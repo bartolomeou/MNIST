@@ -1,11 +1,16 @@
-from flask import (Blueprint, flash, g, redirect, render_template, request, url_for)
+from flask import (Blueprint, flash, g, redirect, render_template, request, url_for, jsonify)
 from werkzeug.exceptions import abort
 
-from app.db import get_db
-from app.job_thread import JobThread
+from server.db import get_db
+from server.job_thread import JobThread
 
-bp = Blueprint('experiment', __name__)
-job_threads = {}
+bp = Blueprint('experiment', __name__, static_folder='../client/static', template_folder='../client/templates')
+job_threads = dict()
+job_progress = dict()
+
+
+def progress_callback(job_id, progress):
+    job_progress[job_id] = progress
 
 
 @bp.route('/')
@@ -29,10 +34,14 @@ def add_job():
     job_id = cursor.lastrowid
     db.commit()
 
-    # process_job(batch_size, learning_rate, epochs, job_id)
-    job_threads[job_id] = JobThread()
+    job_threads[job_id] = JobThread(job_id, progress_callback)
     job_threads[job_id].start()
 
-    return redirect(url_for('experiment.index'))
-    # return 'job id: #%s' % job_id
+    # return redirect(url_for('experiment.index'))
+    return jsonify({'job_id': job_id})
+
+
+@bp.route('/progress/<int:job_id>')
+def progress(job_id):
+    return jsonify({'progress': job_progress.get(job_id, 0)})
     

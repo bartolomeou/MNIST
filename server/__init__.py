@@ -6,7 +6,7 @@ from . import db, experiment
 
 def create_app(test_config=None):
     # create and configure the app
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='../client/static', template_folder='../client/templates')
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'mnist.sqlite')
