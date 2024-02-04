@@ -4,6 +4,12 @@
 	<head>
 		<meta charset="UTF-8" />
 		<title>Experiment Management System</title>
+
+		<!-- include jQuery -->
+		<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+		<!-- include JavaScript file -->
+		<script src="{{ url_for('static', filename='check_progress') }}"></script>
 	</head>
 	<body>
 		<h1>Experiment Management System</h1>
@@ -11,7 +17,7 @@
 			<div>
 				<form
 					id="'newJob"
-					action="{{url_for('add_job')}}"
+					action="{{url_for('experiment.add_job')}}"
 					method="POST"
 				>
 					<label for="batch-size">Batch size</label>
@@ -42,7 +48,10 @@
 				</form>
 			</div>
 
-			{% block result %} {% endblock %}
+			<!-- <script>
+				check_progress(job_id, progress_bar);
+			</script> -->
+			<div class="container">{% block result %} {% endblock %}</div>
 		</main>
 	</body>
 </html>

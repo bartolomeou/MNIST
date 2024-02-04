@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for
 
 from . import db, experiment
-from app.db import get_db
+
 
 def create_app(test_config=None):
     # create and configure the app
@@ -30,28 +30,18 @@ def create_app(test_config=None):
     app.register_blueprint(experiment.bp)
     app.add_url_rule('/', endpoint='index')
 
+    # def process_job(batch_size, learning_rate, epochs, job_id):
+    #     time.sleep(5)
+    #     accuracy = 3
 
-    @app.route('/')
-    def index():
-        db = get_db()
-        jobs = db.execute('SELECT * FROM job ORDER BY accuracy DESC').fetchall()
+    #     db = get_db()
+    #     db.execute('UPDATE job SET accuracy = ? WHERE id = ?', (accuracy, job_id))
+    #     db.commit()
 
-        return render_template('experiment/result.html', jobs=jobs)
-
-
-    @app.route('/add_job', methods=['POST'])
-    def add_job():
-        batch_size = request.form['batch-size']
-        learning_rate = request.form['learning-rate']
-        epochs = request.form['number-of-epochs']
-
-        #TODO: check duplicated jobs
-
-        db = get_db()
-        db.execute('INSERT INTO job (batch_size, learning_rate, epochs) VALUES (?,?,?)', (batch_size, learning_rate, epochs))
-        db.commit()
-
-        return redirect(url_for('index'))
+    # @app.route('/progress/<int:job_id>')
+    # def progress(job_id):
+    #     return str(job_threads[job_id].progress)
     
+
     return app
         

@@ -86,6 +86,9 @@ def test_loop(dataloader, model, loss_fn):
         f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
 
 
+model = NeuralNetwork()
+loss_fn = nn.CrossEntropyLoss()
+
 def train(batch_size, learning_rate, epochs):
     train_dataloader = DataLoader(
         train_data, batch_size=batch_size, shuffle=True)
