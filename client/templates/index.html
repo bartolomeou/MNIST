@@ -1,3 +1,22 @@
+<head>
+	<!-- Other head elements -->
+	<style>
+		#progress_container {
+			width: 100%;
+			height: 20px;
+			background-color: #f0f0f0;
+			margin-bottom: 20px;
+		}
+
+		#progress_bar {
+			height: 100%;
+			width: 0;
+			background-color: #4caf50;
+			transition: width 0.3s ease;
+		}
+	</style>
+</head>
+
 <!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
@@ -44,9 +63,6 @@
 				</form>
 			</div>
 
-			<!-- <script>
-				check_progress(job_id, progress_bar);
-			</script> -->
 			<div id="progress_container">
 				<div id="progress_bar"></div>
 			</div>

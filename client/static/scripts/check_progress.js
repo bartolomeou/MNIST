@@ -1,7 +1,7 @@
 function check_progress(job_id, progress_bar) {
 	function worker() {
 		$.get(`/progress/${job_id}`, function (data) {
-			var progress = parseInt(data);
+			var progress = parseInt(data.progress);
 			console.log(progress);
 			if (progress < 100) {
 				progress_bar.css('width', progress + '%');
