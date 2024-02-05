@@ -7,8 +7,9 @@ from server.db import get_db
 
 
 class JobThread(threading.Thread):
-    def __init__(self, job_id, batch_size, learning_rate, epochs, progress_callback):
+    def __init__(self, app, job_id, batch_size, learning_rate, epochs, progress_callback):
         super().__init__()
+        self.app = app
         self.job_id = job_id
 
         self.train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
@@ -18,7 +19,7 @@ class JobThread(threading.Thread):
 
         self.progress_callback = progress_callback
         self.progress = 0
-    
+
 
     def run(self):
         # train
@@ -44,6 +45,7 @@ class JobThread(threading.Thread):
             
             print(f'Training epoch {epoch + 1} done!')
         
+
         # test
         model.eval() 
         size = len(self.test_dataloader.dataset)
@@ -62,14 +64,9 @@ class JobThread(threading.Thread):
         print(accuracy)
 
         # update database
-        # db = get_db()
-        # db.execute('UPDATE job SET accuracy = ? WHERE id = ?', (accuracy, self.job_id))
-        # db.commit()
-
-
-
-
-
-
-
-
+        with self.app.app_context():
+            db = get_db()
+            print(db)
+            db.execute('UPDATE job SET accuracy = ? WHERE id = ?', (accuracy, self.job_id))
+            db.commit()
+        

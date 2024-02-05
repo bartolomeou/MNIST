@@ -30,18 +30,4 @@ def create_app(test_config=None):
     app.register_blueprint(experiment.bp)
     app.add_url_rule('/', endpoint='index')
 
-    # def process_job(batch_size, learning_rate, epochs, job_id):
-    #     time.sleep(5)
-    #     accuracy = 3
-
-    #     db = get_db()
-    #     db.execute('UPDATE job SET accuracy = ? WHERE id = ?', (accuracy, job_id))
-    #     db.commit()
-
-    # @app.route('/progress/<int:job_id>')
-    # def progress(job_id):
-    #     return str(job_threads[job_id].progress)
-    
-
     return app
-        

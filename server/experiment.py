@@ -1,4 +1,4 @@
-from flask import (Blueprint, flash, g, redirect, render_template, request, url_for, jsonify)
+from flask import (Blueprint, flash, g, redirect, render_template, request, url_for, jsonify, current_app)
 from werkzeug.exceptions import abort
 
 from server.db import get_db
@@ -34,7 +34,7 @@ def add_job():
     job_id = cursor.lastrowid
     db.commit()
 
-    job_threads[job_id] = JobThread(job_id, batch_size, learning_rate, epochs, progress_callback)
+    job_threads[job_id] = JobThread(current_app, job_id, batch_size, learning_rate, epochs, progress_callback)
     job_threads[job_id].start()
 
     return jsonify({'job_id': job_id})
