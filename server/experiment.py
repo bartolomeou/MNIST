@@ -23,9 +23,9 @@ def index():
 
 @bp.route('/add_job', methods=['POST'])
 def add_job():
-    batch_size = request.form['batch-size']
-    learning_rate = request.form['learning-rate']
-    epochs = request.form['number-of-epochs']
+    batch_size = int(request.form['batch-size'])
+    learning_rate = float(request.form['learning-rate'])
+    epochs = int(request.form['number-of-epochs'])
 
     #TODO: check duplicated jobs
 
@@ -34,10 +34,9 @@ def add_job():
     job_id = cursor.lastrowid
     db.commit()
 
-    job_threads[job_id] = JobThread(job_id, progress_callback)
+    job_threads[job_id] = JobThread(job_id, batch_size, learning_rate, epochs, progress_callback)
     job_threads[job_id].start()
 
-    # return redirect(url_for('experiment.index'))
     return jsonify({'job_id': job_id})
 
 

@@ -5,6 +5,8 @@ from torchvision import datasets
 from torchvision.transforms import ToTensor
 
 
+torch.autograd.set_detect_anomaly(True)
+
 # device configuration
 device = (
     'cuda'
