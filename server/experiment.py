@@ -18,6 +18,7 @@ def progress_callback(job_id, progress):
 def completion_callback(job_id, accuracy):
     job_accuracy[job_id] = accuracy
 
+
 @bp.route('/')
 def index():
     db = get_db()
@@ -50,7 +51,8 @@ def progress(job_id):
     progress = job_progress.get(job_id, 0)
 
     if progress == 100:
-        accuracy = job_accuracy[job_id]
+        accuracy = round(job_accuracy[job_id], 2)
+        
         db = get_db()
         db.execute('UPDATE job SET accuracy = ? WHERE id = ?', (accuracy, job_id))
         db.commit()
