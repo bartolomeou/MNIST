@@ -2,7 +2,8 @@ import threading
 import torch
 from torch.utils.data import DataLoader
 
-from server.mnist import model, loss_fn, train_data
+from server.mnist import model, loss_fn, train_data, test_data
+from server.db import get_db
 
 
 class JobThread(threading.Thread):
@@ -11,6 +12,7 @@ class JobThread(threading.Thread):
         self.job_id = job_id
 
         self.train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+        self.test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=True)
         self.optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
         self.epochs = epochs
 
@@ -19,8 +21,9 @@ class JobThread(threading.Thread):
     
 
     def run(self):
-        total_batches = len(self.train_dataloader)
-        batches_per_epoch = total_batches / self.epochs
+        # train
+        model.train()
+        total_len = len(self.train_dataloader.dataset) * self.epochs
 
         for epoch in range(self.epochs):
             print(f'Training epoch {epoch + 1}...')
@@ -36,11 +39,32 @@ class JobThread(threading.Thread):
                 self.optimizer.zero_grad()
 
                 # calculate progress
-                progress = (epoch * batches_per_epoch + batch + 1) / (batches_per_epoch * self.epochs) * 100
-                self.progress_callback(self.job_id, progress)
+                self.progress += (len(X) / total_len) * 100
+                self.progress_callback(self.job_id, self.progress)
             
             print(f'Training epoch {epoch + 1} done!')
-            
+        
+        # test
+        model.eval() 
+        size = len(self.test_dataloader.dataset)
+        num_batches = len(self.test_dataloader)
+        test_loss, correct = 0, 0
+
+        with torch.no_grad():
+            for X, y in self.test_dataloader:
+                pred = model(X)
+                test_loss += loss_fn(pred,y).item()
+                correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+        
+        test_loss /= num_batches
+        accuracy = correct / size * 100
+
+        print(accuracy)
+
+        # update database
+        # db = get_db()
+        # db.execute('UPDATE job SET accuracy = ? WHERE id = ?', (accuracy, self.job_id))
+        # db.commit()
 
 
 
