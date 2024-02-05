@@ -2,14 +2,12 @@ import threading
 import torch
 from torch.utils.data import DataLoader
 
-from server.mnist import model, loss_fn, train_data, test_data
-from server.db import get_db
+from .mnist import model, loss_fn, train_data, test_data
 
 
 class JobThread(threading.Thread):
-    def __init__(self, app, job_id, batch_size, learning_rate, epochs, progress_callback):
+    def __init__(self, job_id, batch_size, learning_rate, epochs, progress_callback, completion_callback):
         super().__init__()
-        self.app = app
         self.job_id = job_id
 
         self.train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
@@ -18,13 +16,15 @@ class JobThread(threading.Thread):
         self.epochs = epochs
 
         self.progress_callback = progress_callback
+        self.completion_callback = completion_callback
+
         self.progress = 0
 
 
     def run(self):
         # train
         model.train()
-        total_len = len(self.train_dataloader.dataset) * self.epochs
+        total_len = (len(self.train_dataloader.dataset) * self.epochs) + len(self.test_dataloader.dataset)
 
         for epoch in range(self.epochs):
             print(f'Training epoch {epoch + 1}...')
@@ -48,7 +48,7 @@ class JobThread(threading.Thread):
 
         # test
         model.eval() 
-        size = len(self.test_dataloader.dataset)
+        test_size = len(self.test_dataloader.dataset)
         num_batches = len(self.test_dataloader)
         test_loss, correct = 0, 0
 
@@ -57,16 +57,16 @@ class JobThread(threading.Thread):
                 pred = model(X)
                 test_loss += loss_fn(pred,y).item()
                 correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+
+                self.progress += (len(X) / total_len) * 100
+                self.progress_callback(self.job_id, self.progress)
         
         test_loss /= num_batches
-        accuracy = correct / size * 100
-
-        print(accuracy)
+        accuracy = correct / test_size * 100
 
         # update database
-        with self.app.app_context():
-            db = get_db()
-            print(db)
-            db.execute('UPDATE job SET accuracy = ? WHERE id = ?', (accuracy, self.job_id))
-            db.commit()
+        self.completion_callback(self.job_id, accuracy)
+
+        self.progress = 100
+        self.progress_callback(self.job_id, self.progress)
         

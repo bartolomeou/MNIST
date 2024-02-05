@@ -5,18 +5,23 @@ from server.db import get_db
 from server.job_thread import JobThread
 
 bp = Blueprint('experiment', __name__, static_folder='../client/static', template_folder='../client/templates')
+
 job_threads = dict()
 job_progress = dict()
+job_accuracy = dict()
 
 
 def progress_callback(job_id, progress):
     job_progress[job_id] = progress
 
 
+def completion_callback(job_id, accuracy):
+    job_accuracy[job_id] = accuracy
+
 @bp.route('/')
 def index():
     db = get_db()
-    jobs = db.execute('SELECT * FROM job ORDER BY accuracy ASC').fetchall()
+    jobs = db.execute('SELECT * FROM job ORDER BY accuracy DESC').fetchall()
 
     return render_template('result.html', jobs=jobs)
 
@@ -34,7 +39,7 @@ def add_job():
     job_id = cursor.lastrowid
     db.commit()
 
-    job_threads[job_id] = JobThread(current_app, job_id, batch_size, learning_rate, epochs, progress_callback)
+    job_threads[job_id] = JobThread(job_id, batch_size, learning_rate, epochs, progress_callback, completion_callback)
     job_threads[job_id].start()
 
     return jsonify({'job_id': job_id})
@@ -42,5 +47,12 @@ def add_job():
 
 @bp.route('/progress/<int:job_id>')
 def progress(job_id):
-    return jsonify({'progress': job_progress.get(job_id, 0)})
-    
+    progress = job_progress.get(job_id, 0)
+
+    if progress == 100:
+        accuracy = job_accuracy[job_id]
+        db = get_db()
+        db.execute('UPDATE job SET accuracy = ? WHERE id = ?', (accuracy, job_id))
+        db.commit()
+
+    return jsonify({'progress': progress})

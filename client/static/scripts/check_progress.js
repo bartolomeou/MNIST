@@ -2,15 +2,18 @@ function check_progress(job_id, progress_bar) {
 	function worker() {
 		$.get(`/progress/${job_id}`, function (data) {
 			var progress = parseInt(data.progress);
-			console.log(progress);
+			// console.log(progress);
 			if (progress < 100) {
 				progress_bar.css('width', progress + '%');
 				setTimeout(worker, 1000);
 			} else {
+				location.reload();
 				console.log('Job completed!');
 			}
 		});
 	}
+
+	function update() {}
 
 	// start the progress-checking worker
 	worker();
